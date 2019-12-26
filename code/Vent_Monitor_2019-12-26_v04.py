@@ -62,34 +62,34 @@ WIDTH  = board.DISPLAY.width
 HEIGHT = board.DISPLAY.height
 
 ELEMENT_SIZE = 16
-BLACK    = 0x000000
-RED      = 0xFF0000
-ORANGE   = 0xFF8800
-YELLOW   = 0xFFFF00
-GREEN    = 0x00FF00
-GREEN_DK = 0x002200
-CYAN     = 0x00FFFF
-BLUE     = 0x0000FF
-VIOLET   = 0x9900FF
-MAGENTA  = 0xFF0033
-PINK     = 0xFF3377
-AQUA     = 0x4088FF
-WHITE    = 0xFFFFFF
-GRAY     = 0x444455
+BLACK   = 0x000000
+RED     = 0xFF0000
+ORANGE  = 0xFF8800
+YELLOW  = 0xFFFF00
+GREEN   = 0x00FF00
+D_GRN   = 0x002200
+CYAN    = 0x00FFFF
+BLUE    = 0x0000FF
+VIOLET  = 0x9900FF
+MAGENTA = 0xFF0033
+PINK    = 0xFF3377
+AQUA    = 0x4088FF
+WHITE   = 0xFFFFFF
+GRAY    = 0x444455
 
 ALARM   = f_to_c(95)  # alarm temp in Celsius
 MIN_RANGE = f_to_c(50)
 MAX_RANGE = f_to_c(120)
 
 TREE = [
-    [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK],
-    [BLACK, BLACK, BLACK, BLACK, GREEN, BLACK, BLACK, BLACK, BLACK],
-    [BLACK, BLACK, BLACK, GREEN, GREEN, GREEN, BLACK, BLACK],
-    [BLACK, BLACK, GREEN, GREEN, GREEN, GREEN, GREEN, BLACK],
-    [BLACK, GREEN, GREEN, GREEN, GREEN, GREEN, GREEN, GREEN],
-    [BLACK, BLACK, BLACK, BLACK, GREEN, BLACK, BLACK, BLACK, BLACK],
-    [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK],
-    [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK]
+    [D_GRN, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK],
+    [D_GRN, D_GRN, BLACK, BLACK, GREEN, BLACK, BLACK, BLACK],
+    [D_GRN, D_GRN, D_GRN, GREEN, GREEN, GREEN, BLACK, BLACK],
+    [D_GRN, D_GRN, GREEN, GREEN, GREEN, GREEN, GREEN, BLACK],
+    [D_GRN, GREEN, GREEN, GREEN, GREEN, GREEN, GREEN, GREEN],
+    [D_GRN, D_GRN, D_GRN, D_GRN, GREEN, D_GRN, BLACK, BLACK],
+    [D_GRN, D_GRN, D_GRN, D_GRN, D_GRN, D_GRN, D_GRN, BLACK],
+    [D_GRN, D_GRN, D_GRN, D_GRN, D_GRN, D_GRN, D_GRN, D_GRN]
     ]
 
 element_color = [GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, VIOLET, WHITE]
@@ -176,7 +176,7 @@ while True:
         while panel.button.a:     time.sleep(0.1)  # wait for button release
         while not panel.button.a:
             disp_group[65].color = BLACK
-            disp_group[65].text  = "-hold-"
+            disp_group[65].text  = "   -hold-"
             time.sleep(0.25)
             disp_group[65].color = WHITE
             time.sleep(0.25)
