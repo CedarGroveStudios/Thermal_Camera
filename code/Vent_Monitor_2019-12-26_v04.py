@@ -83,11 +83,11 @@ MAX_RANGE = f_to_c(120)
 
 TREE = [
     [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK],
-    [BLACK, BLACK, BLACK, BLACK, GREEN_DK, BLACK, BLACK, BLACK, BLACK],
-    [BLACK, BLACK, BLACK, GREEN_DK, GREEN_DK, GREEN_DK, BLACK, BLACK],
-    [BLACK, BLACK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, BLACK],
-    [BLACK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK],
-    [BLACK, BLACK, BLACK, BLACK, GREEN_DK, BLACK, BLACK, BLACK, BLACK],
+    [BLACK, BLACK, BLACK, BLACK, GREEN, BLACK, BLACK, BLACK, BLACK],
+    [BLACK, BLACK, BLACK, GREEN, GREEN, GREEN, BLACK, BLACK],
+    [BLACK, BLACK, GREEN, GREEN, GREEN, GREEN, GREEN, BLACK],
+    [BLACK, GREEN, GREEN, GREEN, GREEN, GREEN, GREEN, GREEN],
+    [BLACK, BLACK, BLACK, BLACK, GREEN, BLACK, BLACK, BLACK, BLACK],
     [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK],
     [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK]
     ]
@@ -115,10 +115,12 @@ for row in range(0, 8):
                            fill=TREE[row][col])
         disp_group.append(new_element)
 
-cg_display = Label(font, text="Cedar Grove", color=GREEN, max_glyphs=11)
+cg_display = Label(font, text="Cedar Grove", color=BLACK, max_glyphs=11)
 cg_display.x = (WIDTH // 2) - 15
 cg_display.y = 15 + (int(1.5 * HEIGHT) // 4)
 disp_group.append(cg_display)
+
+time.sleep(1)
 
 alarm_display = Label(font, text="ALM", color=WHITE, max_glyphs=5)
 alarm_display.x = 0
@@ -140,7 +142,7 @@ min_display.x = 0
 min_display.y = 15 + (3 * HEIGHT // 4)
 disp_group.append(min_display)
 
-time.sleep(2.0)
+time.sleep(1.0)
 disp_group[65].text = ""
 
 ### Primary Process ###
@@ -172,8 +174,14 @@ while True:
 
     if panel.button.a:  # hold/release display (shutter = button A)
         while panel.button.a:     time.sleep(0.1)  # wait for button release
-        while not panel.button.a: time.sleep(0.1)  # second click: resume
+        while not panel.button.a:
+            disp_group[65].color = BLACK
+            disp_group[65].text  = "-hold-"
+            time.sleep(0.25)
+            disp_group[65].color = WHITE
+            time.sleep(0.25)
         while panel.button.a:     time.sleep(0.1)  # wait for button release
+        disp_group[65].text  = ""
 
     if panel.button.select:  # switch display mode (select button)
         while panel.button.select:     time.sleep(0.1)  # wait for button release
