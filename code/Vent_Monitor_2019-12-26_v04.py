@@ -82,14 +82,14 @@ MIN_RANGE = f_to_c(50)
 MAX_RANGE = f_to_c(120)
 
 TREE = [
+    [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK],
     [BLACK, BLACK, BLACK, BLACK, GREEN_DK, BLACK, BLACK, BLACK, BLACK],
     [BLACK, BLACK, BLACK, GREEN_DK, GREEN_DK, GREEN_DK, BLACK, BLACK],
-    [BLACK, BLACK, BLACK, GREEN_DK, GREEN_DK, GREEN_DK, BLACK, BLACK],
-    [BLACK, BLACK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, BLACK],
     [BLACK, BLACK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, BLACK],
     [BLACK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK],
-    [BLACK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK, GREEN_DK],
-    [BLACK, BLACK, BLACK, BLACK, GREEN_DK, BLACK, BLACK, BLACK]
+    [BLACK, BLACK, BLACK, BLACK, GREEN_DK, BLACK, BLACK, BLACK, BLACK],
+    [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK],
+    [BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK]
     ]
 
 element_color = [GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, VIOLET, WHITE]
@@ -112,12 +112,12 @@ for row in range(0, 8):
         pos = element_grid(col, row)
         new_element = Rect(x=pos.x, y=pos.y,
                            width=ELEMENT_SIZE, height=ELEMENT_SIZE,
-                           fill=TREE[row][col], outline=BLACK, stroke=2)
+                           fill=TREE[row][col])
         disp_group.append(new_element)
 
 cg_display = Label(font, text="Cedar Grove", color=GREEN, max_glyphs=11)
 cg_display.x = (WIDTH // 2) - 15
-cg_display.y = 15 + (0 * HEIGHT // 4)
+cg_display.y = 15 + (int(1.5 * HEIGHT) // 4)
 disp_group.append(cg_display)
 
 alarm_display = Label(font, text="ALM", color=WHITE, max_glyphs=5)
