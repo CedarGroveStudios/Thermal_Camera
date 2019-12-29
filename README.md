@@ -1,6 +1,6 @@
-# Cedar Grove Dryer Vent Monitor
+# Cedar Grove Thermal Camera
 
-### _A safety device to monitor dryer vent distributed temperature._
+### _A temperature visualization device._
 
 ![Image of Module](https://github.com/CedarGroveStudios/Robot_Friend_FeatherWing/blob/master/photos%20and%20graphics/Robot_Friend_expl_wide.png)
 yyy
