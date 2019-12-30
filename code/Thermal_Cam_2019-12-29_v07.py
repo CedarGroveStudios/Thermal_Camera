@@ -37,7 +37,9 @@ with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     splash.append(displayio.TileGrid(bitmap,
                   pixel_shader=displayio.ColorConverter()))
     board.DISPLAY.show(splash)
-    time.sleep(3)  # hold the splash screen for a bit
+    time.sleep(0.1)  # allow the splash to display
+
+panel.play_file("shop_bell_alarm.wav")
 
 ### Settings ###
 WIDTH  = board.DISPLAY.width
@@ -72,6 +74,7 @@ def element_grid(row, col):
     return Coords(ELEMENT_SIZE * row + 30, ELEMENT_SIZE * col + 1)
 
 def update_image_frame(min, max, sum):
+    alarm = False
     for row in range(0, 8):  # parse camera data list and update display
         for col in range(0, 8):
             value = map_range(image[7 - col][7 - row], 0, 80, 0, 80)
@@ -83,12 +86,15 @@ def update_image_frame(min, max, sum):
             sum = sum + value  # calculate sum for average
             if value < min : min = value  # find min value
             if value > max : max = value  # find max value
-    return min, max, sum
+            if value >= ALARM_C: alarm = True
+    return min, max, sum, alarm
 
 def update_histo_frame():
+    alarm = False
     for row in range(0, 8):  # parse camera data list and update display
         for col in range(7, -1, -1):
             value = map_range(image[7 - col][7 - row], 0, 80, 0, 80)
+            if value >= ALARM_C: alarm = True
             histo_index = int(map_range(value, MIN_RANGE, MAX_RANGE, 0, 7))
             element_histo[histo_index] = element_histo[histo_index] + 1
             pos = element_grid(histo_index, 7 - (element_histo[histo_index] // 8))
@@ -96,7 +102,7 @@ def update_histo_frame():
                                                      height=ELEMENT_SIZE,
                                                      fill=element_color[histo_index],
                                                      outline=BLACK, stroke=1)
-    return
+    return alarm
 
 ### Set alarm and range values ###
 ALARM_F   = 95               # alarm temp in Farenheit
@@ -183,15 +189,17 @@ while True:
     # Display image or histogram
     image = amg8833.pixels  # get camera data list
     if display_mode == "image":
-        v_min, v_max, v_sum = update_image_frame(v_min, v_max, v_sum)
+        v_min, v_max, v_sum, alarm = update_image_frame(v_min, v_max, v_sum)
     if display_mode == "histo":
-        update_histo_frame()
+        alarm = update_histo_frame()
 
     # update display text values
     disp_group[70].text = str(ALARM_F)
     disp_group[71].text = str(c_to_f(v_max))
     disp_group[72].text = str(c_to_f(v_sum // 64))
     disp_group[73].text = str(c_to_f(v_min))
+
+    if alarm: panel.play_file("shop_bell_alarm.wav")
 
     # See if a panel button is pressed
     if panel.button.a:  # display hold text label (shutter = button A)
