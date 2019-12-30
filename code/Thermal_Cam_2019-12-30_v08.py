@@ -220,10 +220,10 @@ while True:  # Display image or histogram
         if display_hold == False:  display_hold = True
         else:  display_hold = False
         while panel.button.a: pass  # wait for button release
-        panel.play_tone(660, 0.030)
+        panel.play_tone(1220, 0.030)
 
     if panel.button.b:  # toggle image/histogram mode (display mode = button B)
         if display_image:  display_image = False
         else: display_image = True
         while panel.button.b:  pass  # wait for button release
-        panel.play_tone(330, 0.030)
+        panel.play_tone(660, 0.030)
