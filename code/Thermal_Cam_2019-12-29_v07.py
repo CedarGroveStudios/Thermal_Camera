@@ -31,6 +31,7 @@ amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 Coords = namedtuple("Point", "x y")
 
 # display spash graphics
+
 with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     bitmap = displayio.OnDiskBitmap(bitmap_file)
     splash = displayio.Group()
@@ -39,7 +40,10 @@ with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     board.DISPLAY.show(splash)
     time.sleep(0.1)  # allow the splash to display
 
-panel.play_file("shop_bell_alarm.wav")
+panel.play_tone(880, 0.1)
+panel.play_tone(440, 0.1)
+time.sleep(1)
+panel.play_tone(880, 0.1)
 
 ### Settings ###
 WIDTH  = board.DISPLAY.width
@@ -73,8 +77,10 @@ def f_to_c(temp=32):
 def element_grid(row, col):
     return Coords(ELEMENT_SIZE * row + 30, ELEMENT_SIZE * col + 1)
 
-def update_image_frame(min, max, sum):
-    alarm = False
+def update_image_frame():
+    minimum = 80 # set minimum to maximum C value
+    maximum = 0  # set maximum to minimum C value
+    sum_bucket = 0  # bucket for building average value
     for row in range(0, 8):  # parse camera data list and update display
         for col in range(0, 8):
             value = map_range(image[7 - col][7 - row], 0, 80, 0, 80)
@@ -83,29 +89,33 @@ def update_image_frame(min, max, sum):
             disp_group[((row * 8) + col) + 1] = Rect(x=pos.x, y=pos.y, width=ELEMENT_SIZE,
                                                      height=ELEMENT_SIZE,
                                                      fill=element_color[color_index])
-            sum = sum + value  # calculate sum for average
-            if value < min : min = value  # find min value
-            if value > max : max = value  # find max value
-            if value >= ALARM_C: alarm = True
-    return min, max, sum, alarm
+            sum_bucket = sum_bucket + value  # calculate sum for average
+            minimum = min(value, minimum)
+            maximum = max(value, maximum)
+    return minimum, maximum, sum_bucket
 
 def update_histo_frame():
-    alarm = False
+    minimum = 80 # set minimum to maximum C value
+    maximum = 0  # set maximum to minimum C value
+    sum_bucket = 0  # bucket for building average value
+    histo_bucket = [0, 0, 0, 0, 0, 0, 0, 0]  # reset histogram bucket
     for row in range(0, 8):  # parse camera data list and update display
         for col in range(7, -1, -1):
             value = map_range(image[7 - col][7 - row], 0, 80, 0, 80)
-            if value >= ALARM_C: alarm = True
             histo_index = int(map_range(value, MIN_RANGE, MAX_RANGE, 0, 7))
-            element_histo[histo_index] = element_histo[histo_index] + 1
-            pos = element_grid(histo_index, 7 - (element_histo[histo_index] // 8))
+            histo_bucket[histo_index] = histo_bucket[histo_index] + 1
+            pos = element_grid(histo_index, 7 - (histo_bucket[histo_index] // 8))
             disp_group[((row * 8) + col) + 1] = Rect(x=pos.x, y=pos.y, width=ELEMENT_SIZE,
                                                      height=ELEMENT_SIZE,
                                                      fill=element_color[histo_index],
                                                      outline=BLACK, stroke=1)
-    return alarm
+            sum_bucket = sum_bucket + value  # calculate sum for average
+            minimum = min(value, minimum)
+            maximum = max(value, maximum)
+    return minimum, maximum, sum_bucket
 
 ### Set alarm and range values ###
-ALARM_F   = 95               # alarm temp in Farenheit
+ALARM_F   = 120               # alarm temp in Farenheit
 ALARM_C   = f_to_c(ALARM_F)  # alarm temp in Celsius
 MIN_RANGE = f_to_c(50)
 MAX_RANGE = f_to_c(120)
@@ -180,18 +190,12 @@ disp_group[65].text = ""
 
 ### Primary Process: Get camera data and update display ###
 display_mode = "image"  # default to image display mode
-while True:
-    v_min = 80 # set minimum to maximum C value
-    v_max = 0  # set maximum to minimum C value
-    v_sum = 0  # bucket for building average value
-    element_histo = [0, 0, 0, 0, 0, 0 , 0, 0]  # reset histogram table
-
-    # Display image or histogram
+while True:  # Display image or histogram
     image = amg8833.pixels  # get camera data list
     if display_mode == "image":
-        v_min, v_max, v_sum, alarm = update_image_frame(v_min, v_max, v_sum)
+        v_min, v_max, v_sum = update_image_frame()
     if display_mode == "histo":
-        alarm = update_histo_frame()
+        v_min, v_max, v_sum = update_histo_frame()
 
     # update display text values
     disp_group[70].text = str(ALARM_F)
@@ -199,18 +203,18 @@ while True:
     disp_group[72].text = str(c_to_f(v_sum // 64))
     disp_group[73].text = str(c_to_f(v_min))
 
-    if alarm: panel.play_file("shop_bell_alarm.wav")
+    if v_max >= ALARM_C:  panel.play_tone(880, 0.030)
 
     # See if a panel button is pressed
     if panel.button.a:  # display hold text label (shutter = button A)
-        while panel.button.a:     time.sleep(0.1)  # wait for button release
+        while panel.button.a:  time.sleep(0.1)  # wait for button release
         while not panel.button.a:
             disp_group[65].color = WHITE
             disp_group[65].text  = "-hold-"
             time.sleep(0.25)
             disp_group[65].color = BLACK
             time.sleep(0.25)
-        while panel.button.a:     time.sleep(0.1)  # wait for button release
+        while panel.button.a:  time.sleep(0.1)  # wait for button release
         disp_group[65].text  = ""  # clear hold text label
 
     if panel.button.select:  # toggle image/histogram mode (select button)
