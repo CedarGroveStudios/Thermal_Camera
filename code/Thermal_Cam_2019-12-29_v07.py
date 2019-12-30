@@ -140,7 +140,7 @@ for row in range(0, 8):
                           width=ELEMENT_SIZE, height=ELEMENT_SIZE,
                           fill=None))
 
-hold_label = Label(font, text="", color=BLACK, max_glyphs=6)
+hold_label = Label(font, text="", color=WHITE, max_glyphs=6)
 hold_label.x = (WIDTH // 2) - 7
 hold_label.y = 15 + int(1.4 * HEIGHT // 4)
 disp_group.append(hold_label)
@@ -189,12 +189,14 @@ time.sleep(1.0)
 disp_group[65].text = ""
 
 ### Primary Process: Get camera data and update display ###
-display_mode = "image"  # default to image display mode
+display_image = True  # default to image display mode
+display_hold = False       # default to active display mode
+
 while True:  # Display image or histogram
-    image = amg8833.pixels  # get camera data list
-    if display_mode == "image":
+    if not display_hold:  image = amg8833.pixels  # get camera data list
+    if display_image:
         v_min, v_max, v_sum = update_image_frame()
-    if display_mode == "histo":
+    else:
         v_min, v_max, v_sum = update_histo_frame()
 
     # update display text values
@@ -205,19 +207,24 @@ while True:  # Display image or histogram
 
     if v_max >= ALARM_C:  panel.play_tone(880, 0.030)
 
-    # See if a panel button is pressed
-    if panel.button.a:  # display hold text label (shutter = button A)
-        while panel.button.a:  time.sleep(0.1)  # wait for button release
-        while not panel.button.a:
-            disp_group[65].color = WHITE
-            disp_group[65].text  = "-hold-"
-            time.sleep(0.25)
-            disp_group[65].color = BLACK
-            time.sleep(0.25)
-        while panel.button.a:  time.sleep(0.1)  # wait for button release
-        disp_group[65].text  = ""  # clear hold text label
+    if display_hold:  # display hold text label
+        disp_group[65].color = WHITE
+        disp_group[65].text  = "-hold-"
+        time.sleep(0.1)
+        disp_group[65].color = BLACK
+        disp_group[65].text  = "-hold-"
+        time.sleep(0.1)
+    else: disp_group[65].text  = ""  # clear hold text label
 
-    if panel.button.select:  # toggle image/histogram mode (select button)
-        while panel.button.select:  time.sleep(0.1)  # wait for button release
-        if display_mode == "image": display_mode = "histo"
-        else: display_mode = "image"
+    # See if a panel button is pressed
+    if panel.button.a:  # toggle display hold (shutter = button A)
+        if display_hold == False:  display_hold = True
+        else:  display_hold = False
+        while panel.button.a: pass  # wait for button release
+        panel.play_tone(660, 0.030)
+
+    if panel.button.b:  # toggle image/histogram mode (display mode = button B)
+        if display_image:  display_image = False
+        else: display_image = True
+        while panel.button.b:  pass  # wait for button release
+        panel.play_tone(330, 0.030)
