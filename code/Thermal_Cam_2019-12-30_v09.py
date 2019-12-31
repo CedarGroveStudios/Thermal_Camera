@@ -122,8 +122,9 @@ def setup_mode(alarm):
         left, right, up, down = move_buttons(joystick=panel.has_joystick)
         if up  : alarm = alarm + 1
         if down: alarm = alarm - 1
-        alarm = int(map_range(alarm, MIN_RANGE_F, MAX_RANGE_F, MIN_RANGE_F, MAX_RANGE_F))
-        disp_group[70].text = str(alarm)
+        if alarm > MAX_RANGE_F: alarm = MAX_RANGE_F
+        if alarm < MIN_RANGE_F: alarm = MIN_RANGE_F
+        disp_group[70].text = str(int(alarm))
         disp_group[65].color = WHITE
         disp_group[66].color = WHITE
         time.sleep(0.1)
