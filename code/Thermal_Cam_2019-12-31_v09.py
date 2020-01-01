@@ -120,12 +120,14 @@ def update_histo_frame():
     return minimum, maximum, sum_bucket
 
 def setup_mode():
+    disp_group[65].color = WHITE
     disp_group[65].text  = "-SET-"
     disp_group[69].color = BLACK
     disp_group[73].color = BLACK
     disp_group[71].text = str(MAX_RANGE_F)
     disp_group[72].text = str(MIN_RANGE_F)
-    time.sleep(0.5)
+    time.sleep(0.8)
+    disp_group[65].text  = ""
 
     param_index = 0  # index of parameter to set
     while not panel.button.start:
