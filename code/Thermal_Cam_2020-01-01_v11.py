@@ -134,14 +134,14 @@ def update_histo_frame():
     return minimum, maximum, sum_bucket
 
 def setup_mode():
-    disp_group[65].color = WHITE
-    disp_group[65].text  = "-SET-"
+    status_label.color = WHITE
+    status_label.text  = "-SET-"
     disp_group[69].color = BLACK
     disp_group[73].color = BLACK
     disp_group[71].text = str(MAX_RANGE_F)
     disp_group[72].text = str(MIN_RANGE_F)
     time.sleep(0.8)
-    disp_group[65].text  = ""
+    status_label.text  = ""
 
     param_index = 0  # index of parameter to set
     while not panel.button.start:
@@ -151,12 +151,12 @@ def setup_mode():
             if down: param_index = param_index + 1
             if param_index > 2: param_index = 2
             if param_index < 0: param_index = 0
-            disp_group[65].text = param_list[param_index][0]
+            status_label.text = param_list[param_index][0]
             disp_group[param_index + 66].color = BLACK
-            disp_group[65].color = BLACK
+            status_label.color = BLACK
             time.sleep(0.2)
             disp_group[param_index + 66].color = param_list[param_index][1]
-            disp_group[65].color = WHITE
+            status_label.color = WHITE
             time.sleep(0.2)
 
         if panel.button.a:  panel.play_tone(1319, 0.030)  # E6
@@ -171,10 +171,10 @@ def setup_mode():
             if param_value < convert_temp(c=MIN_SENSOR_C):  param_value = convert_temp(c=MIN_SENSOR_C)
             disp_group[param_index + 70].text = str(param_value)
             disp_group[param_index + 70].color = BLACK
-            disp_group[65].color = BLACK
+            status_label.color = BLACK
             time.sleep(0.05)
             disp_group[param_index + 70].color = param_list[param_index][1]
-            disp_group[65].color = WHITE
+            status_label.color = WHITE
             time.sleep(0.2)
 
         if panel.button.a:  panel.play_tone(1319, 0.030)  # E6
@@ -182,9 +182,9 @@ def setup_mode():
 
     if panel.button.start: panel.play_tone(784, 0.030)  # G5
     while panel.button.start:  pass  # wait for button release
-    disp_group[65].text = "RESUME"
+    status_label.text = "RESUME"
     time.sleep(0.5)
-    disp_group[65].text = ""
+    status_label.text = ""
     disp_group[69].color = YELLOW
     disp_group[73].color = YELLOW
     return int(disp_group[70].text), int(disp_group[71].text),int(disp_group[72].text)
@@ -214,7 +214,7 @@ disp_group = displayio.Group(max_size=77)
 board.DISPLAY.show(disp_group)
 
 # Create a background color fill
-# disp_group[0]
+# Background; disp_group[0]
 color_bitmap = displayio.Bitmap(WIDTH, HEIGHT, 1)
 color_palette = displayio.Palette(1)
 color_palette[0] = BLACK
@@ -317,22 +317,22 @@ while True:
         v_min, v_max, v_sum = update_histo_frame()
 
     # display alarm, maxumum, minimum, and average values
-    disp_group[70].text = str(ALARM_F)
-    disp_group[71].text = str(convert_temp(c=v_max))
-    disp_group[72].text = str(convert_temp(c=v_min))
-    disp_group[73].text = str(convert_temp(c=v_sum // 64))
+    alarm_display.text = str(ALARM_F)
+    max_display.text = str(convert_temp(c=v_max))
+    min_display.text = str(convert_temp(c=v_min))
+    ave_display.text = str(convert_temp(c=v_sum // 64))
 
     # play alarm note if maximum value reaches alarm threshold
     if v_max >= ALARM_C:  panel.play_tone(880, 0.015)  # A5
     if v_max >= ALARM_C:  panel.play_tone(880 + (10 * (v_max - ALARM_C)), 0.015)  # A5
 
     if display_hold:  # flash hold status text label
-        disp_group[65].color = WHITE
-        disp_group[65].text  = "-HOLD-"
+        status_label.color = WHITE
+        status_label.text  = "-HOLD-"
         time.sleep(0.1)
-        disp_group[65].color = BLACK
+        status_label.color = BLACK
         time.sleep(0.1)
-    else: disp_group[65].text = ""  # clear status text label
+    else: status_label.text = ""  # clear status text label
 
     # See if a panel button is pressed
     if panel.button.a:  # toggle display hold (shutter = button A)
@@ -355,10 +355,10 @@ while True:
             MAX_RANGE_F = temp_max_range_f
             MIN_RANGE_C = convert_temp(f=MIN_RANGE_F)  # update range temp in Celsius
             MAX_RANGE_C = convert_temp(f=MAX_RANGE_F)  # update range temp in Celsius
-            disp_group[65].color = WHITE
-            disp_group[65].text  = "ORIG"
+            status_label.color = WHITE
+            status_label.text  = "ORIG"
             time.sleep(0.2)
-            disp_group[65].color = BLACK
+            status_label.color = BLACK
             time.sleep(0.2)
         else:
             display_focus = True  # set range values to image min/max
@@ -368,10 +368,10 @@ while True:
             MAX_RANGE_F = convert_temp(c=v_max)
             MIN_RANGE_C = v_min  # update range temp in Celsius
             MAX_RANGE_C = v_max  # update range temp in Celsius
-            disp_group[65].color = WHITE
-            disp_group[65].text  = "FOCUS"
+            status_label.color = WHITE
+            status_label.text  = "FOCUS"
             time.sleep(0.2)
-            disp_group[65].color = BLACK
+            status_label.color = BLACK
             time.sleep(0.2)
         while panel.button.select:  pass  # wait for button release
 
