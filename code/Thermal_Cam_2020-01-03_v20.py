@@ -1,7 +1,7 @@
-# Thermal_Cam_2020-01-02_v20.py
+# Thermal_Cam_2020-01-03_v20.py
 # (c) 2020 Cedar Grove Studios
 
-print("Thermal_Cam_2020-01-02_v20.py")
+print("Thermal_Cam_2020-01-03_v20.py")
 
 import time
 from collections import namedtuple
@@ -46,7 +46,6 @@ with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
 
 panel.play_tone(440, 0.1)  # A4
 panel.play_tone(880, 0.1)  # A5
-time.sleep(1)
 
 ### Settings ###
 WIDTH  = board.DISPLAY.width
@@ -174,7 +173,7 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
             left, right, up, down = move_buttons(joystick=panel.has_joystick)
             if up  :  param_value = param_value + 1
             if down:  param_value = param_value - 1
-            if param_value > convert_temp(c=MAX_SENSOR_C):  paramr_value = convert_temp(c=MAX_SENSOR_C)
+            if param_value > convert_temp(c=MAX_SENSOR_C):  param_value = convert_temp(c=MAX_SENSOR_C)
             if param_value < convert_temp(c=MIN_SENSOR_C):  param_value = convert_temp(c=MIN_SENSOR_C)
             image_group[param_index + 70].text = str(param_value)
             image_group[param_index + 70].color = BLACK
@@ -222,7 +221,6 @@ MAX_RANGE_C = convert_temp(f=MAX_RANGE_F)
 
 # Establish the display context
 image_group = displayio.Group(max_size=77)
-board.DISPLAY.show(image_group)
 
 # Create a background color fill
 # Background; disp_group[0]
@@ -319,6 +317,7 @@ image_group.append(range_histo)
 display_image = True   # Image display mode; False for histogram
 display_hold  = False  # Active display mode; True to hold display
 display_focus = False  # Standard display range; True to focus display range
+board.DISPLAY.show(image_group)
 panel.play_tone(880, 0.1)  # A5; ready to start looking
 
 while True:
