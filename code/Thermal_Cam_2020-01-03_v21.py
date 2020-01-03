@@ -1,7 +1,7 @@
-# Thermal_Cam_2020-01-03_v20.py
+# Thermal_Cam_2020-01-03_v21.py
 # (c) 2020 Cedar Grove Studios
 
-print("Thermal_Cam_2020-01-03_v20.py")
+print("Thermal_Cam_2020-01-03_v21.py")
 
 import time
 from collections import namedtuple
@@ -13,9 +13,6 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 import adafruit_amg88xx
 from adafruit_pybadger import PyBadger
-
-# Load default alarm and min/max range values
-from Thermal_Cam_config import *
 
 # Establish panel instance
 panel = PyBadger(pixels_brightness=0.01)
@@ -32,10 +29,7 @@ else: panel.has_joystick = False
 i2c = board.I2C()
 amg8833 = adafruit_amg88xx.AMG88XX(i2c)
 
-Coords = namedtuple("Point", "x y")
-
-# display spash graphics
-
+# Display spash graphics
 with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     bitmap = displayio.OnDiskBitmap(bitmap_file)
     splash = displayio.Group()
@@ -47,7 +41,13 @@ with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
 panel.play_tone(440, 0.1)  # A4
 panel.play_tone(880, 0.1)  # A5
 
+Coords = namedtuple("Point", "x y")
+
 ### Settings ###
+
+# Load F default alarm and min/max range values
+from Thermal_Cam_config import *
+
 WIDTH  = board.DISPLAY.width
 HEIGHT = board.DISPLAY.height
 
@@ -60,13 +60,9 @@ RED     = 0xFF0000
 ORANGE  = 0xFF8811
 YELLOW  = 0xFFFF00
 GREEN   = 0x00FF00
-D_GRN   = 0x002200
 CYAN    = 0x00FFFF
 BLUE    = 0x0000FF
 VIOLET  = 0x9900FF
-MAGENTA = 0xFF0033
-PINK    = 0xFF3377
-AQUA    = 0x4088FF
 WHITE   = 0xFFFFFF
 GRAY    = 0x444455
 
@@ -75,12 +71,20 @@ param_list = [("ALARM", WHITE), ("RANGE", RED), ("RANGE", CYAN)]
 
 ### Converters and Helpers ###
 def convert_temp(f=None, c=None):  # convert F to C and C to F
-    if f != None and c == None: return round((f - 32) * (5 / 9))
-    if f == None and c != None: return round(((9 / 5) * c) + 32)
+    if f != None and c == None: return round((f - 32) * (5 / 9))  # F to C
+    if f == None and c != None: return round(((9 / 5) * c) + 32)  # C to F
     return None
 
-def element_grid(col, row):
-    return Coords(ELEMENT_SIZE * col + 30, ELEMENT_SIZE * row + 1)
+def element_grid(col, row):  # Determine display coordinates for column, row
+    return Coords(int(ELEMENT_SIZE * col + 30), int(ELEMENT_SIZE * row + 1))
+
+def flash_status(text="", duration=0.1):  # Flash status message
+    status_label.color = WHITE
+    status_label.text  = text
+    time.sleep(duration)
+    status_label.color = BLACK
+    time.sleep(duration)
+    return
 
 def update_image_frame():  # Get camera data and display
     minimum = MAX_SENSOR_C  # Set minimum to sensor's maximum C value
@@ -143,7 +147,7 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
     max_value.text = str(MAX_RANGE_F)  # Display maximum range value
     min_value.text = str(MIN_RANGE_F)  # Display minimum range value
 
-    time.sleep(0.8)  # Prepare to display parameter type text
+    time.sleep(0.8)  # Show SET status text for a while
     status_label.text  = ""
 
     param_index = 0  # Clear index of parameter to set
@@ -214,7 +218,7 @@ def move_buttons(joystick=False):  # Read position buttons and joystick
         if panel.button.down : move_d = True
     return move_r, move_l, move_u, move_d
 
-### Set Celsius alarm and range values ###
+# Set C default alarm and min/max range values
 ALARM_C     = convert_temp(f=ALARM_F)  # alarm temp in Celsius
 MIN_RANGE_C = convert_temp(f=MIN_RANGE_F)
 MAX_RANGE_C = convert_temp(f=MAX_RANGE_F)
@@ -231,7 +235,7 @@ background = displayio.TileGrid(color_bitmap, pixel_shader=color_palette,
                                 x=0, y=0)
 image_group.append(background)
 
-# Define and build the foundational display group
+### Define and build the foundational display group ###
 # image_group[1:64]; [x]=(row * 8) + column
 for row in range(0, 8):
     for col in range(0, 8):
@@ -241,76 +245,77 @@ for row in range(0, 8):
                        fill=None, outline=None, stroke=0)
         image_group.append(element)
 
-# Status label; image_group[65]
+# Define labels and values using element grid coordinates
 status_label = Label(font, text="", color=BLACK, max_glyphs=6)
-status_label.x = (WIDTH // 2) - 7
-status_label.y = int(1.4 * HEIGHT // 4) + 15
+pos = element_grid(2.5, 4)
+status_label.x = pos.x
+status_label.y = pos.y
 image_group.append(status_label)
 
-# Alarm label; image_group[66]
 alarm_label = Label(font, text="alm", color=WHITE, max_glyphs=3)
-alarm_label.x = 0
-alarm_label.y = int(0.5 * HEIGHT // 4) + 10
+pos = element_grid(-1.8, 1.5)
+alarm_label.x = pos.x
+alarm_label.y = pos.y
 image_group.append(alarm_label)
 
-# Maximum label; image_group[67]
 max_label = Label(font, text="max", color=RED, max_glyphs=3)
-max_label.x = 0
-max_label.y = int(1.5 * HEIGHT // 4) + 10
+pos = element_grid(-1.8, 3.5)
+max_label.x = pos.x
+max_label.y = pos.y
 image_group.append(max_label)
 
-# Minimum label; image_group[68]
 min_label = Label(font, text="min", color=CYAN, max_glyphs=3)
-min_label.x = 0
-min_label.y = int(3.5 * HEIGHT // 4) + 10
+pos = element_grid(-1.8, 7.5)
+min_label.x = pos.x
+min_label.y = pos.y
 image_group.append(min_label)
 
-# Average label; image_group[69]
 ave_label = Label(font, text="ave", color=YELLOW, max_glyphs=3)
-ave_label.x = 0
-ave_label.y = int(2.5 * HEIGHT // 4) + 10
+pos = element_grid(-1.8, 5.5)
+ave_label.x = pos.x
+ave_label.y = pos.y
 image_group.append(ave_label)
 
-# Alarm value; image_group[70]
 alarm_value = Label(font, text=str(ALARM_F), color=WHITE, max_glyphs=5)
-alarm_value.x = 0
-alarm_value.y = int(0 * HEIGHT // 4) + 10
+pos = element_grid(-1.8, 0.5)
+alarm_value.x = pos.x
+alarm_value.y = pos.y
 image_group.append(alarm_value)
 
-# Maximum value; image_group[71]
 max_value = Label(font, text=str(MAX_RANGE_F), color=RED, max_glyphs=5)
-max_value.x = 0
-max_value.y = int(1 * HEIGHT // 4) + 10
+pos = element_grid(-1.8, 2.5)
+max_value.x = pos.x
+max_value.y = pos.y
 image_group.append(max_value)
 
-# Minimum value; image_group[72]
 min_value = Label(font, text=str(MIN_RANGE_F), color=CYAN, max_glyphs=5)
-min_value.x = 0
-min_value.y = int(3 * HEIGHT // 4) + 10
+pos = element_grid(-1.8, 6.5)
+min_value.x = pos.x
+min_value.y = pos.y
 image_group.append(min_value)
 
-# Average value; image_group[73]
 ave_value = Label(font, text="---", color=YELLOW, max_glyphs=5)
-ave_value.x = 0
-ave_value.y = int(2 * HEIGHT // 4) + 10
+pos = element_grid(-1.8, 4.5)
+ave_value.x = pos.x
+ave_value.y = pos.y
 image_group.append(ave_value)
 
-# Histogram minimum range value; image_group[74]
 min_histo = Label(font, text="", color=CYAN, max_glyphs=3)
-min_histo.x = (WIDTH // 4) - 5
-min_histo.y = int(3.5 * HEIGHT // 4) + 10
+pos = element_grid(0.5, 7.5)
+min_histo.x = pos.x
+min_histo.y = pos.y
 image_group.append(min_histo)
 
-# Histogram maximum range value; image_group[75]
 max_histo = Label(font, text="", color=RED, max_glyphs=3)
-max_histo.x = int(3 * WIDTH // 4) + 10
-max_histo.y = int(3.5 * HEIGHT // 4) + 10
+pos = element_grid(6.5, 7.5)
+max_histo.x = pos.x
+max_histo.y = pos.y
 image_group.append(max_histo)
 
-# Histogram range text label; image_group[75]
 range_histo = Label(font, text="", color=BLUE, max_glyphs=7)
-range_histo.x = int(1.5 * WIDTH // 4) + 5
-range_histo.y = int(3.5 * HEIGHT // 4) + 10
+pos = element_grid(2.5, 7.5)
+range_histo.x = pos.x
+range_histo.y = pos.y
 image_group.append(range_histo)
 
 ###--- Primary Process ---###
@@ -321,7 +326,12 @@ board.DISPLAY.show(image_group)
 panel.play_tone(880, 0.1)  # A5; ready to start looking
 
 while True:
-    if not display_hold:  image = amg8833.pixels  # get camera data list
+    if display_hold:  # flash hold status text label
+        flash_status("-HOLD-")
+    else:
+        image = amg8833.pixels  # get camera data list
+        status_label.text = ""  # clear status text label
+
     if display_image:  # image display mode
         v_min, v_max, v_sum = update_image_frame()
     else:  # histogram display mode
@@ -329,21 +339,13 @@ while True:
 
     # display alarm, maxumum, minimum, and average values
     alarm_value.text = str(ALARM_F)
-    max_value.text = str(convert_temp(c=v_max))
-    min_value.text = str(convert_temp(c=v_min))
-    ave_value.text = str(convert_temp(c=v_sum // 64))
+    max_value.text   = str(convert_temp(c=v_max))
+    min_value.text   = str(convert_temp(c=v_min))
+    ave_value.text   = str(convert_temp(c=v_sum // 64))
 
     # play alarm note if maximum value reaches alarm threshold
     if v_max >= ALARM_C:  panel.play_tone(880, 0.015)  # A5
     if v_max >= ALARM_C:  panel.play_tone(880 + (10 * (v_max - ALARM_C)), 0.015)  # A5
-
-    if display_hold:  # flash hold status text label
-        status_label.color = WHITE
-        status_label.text  = "-HOLD-"
-        time.sleep(0.1)
-        status_label.color = BLACK
-        time.sleep(0.1)
-    else: status_label.text = ""  # clear status text label
 
     # See if a panel button is pressed
     if panel.button.a:  # toggle display hold (shutter = button A)
@@ -366,11 +368,7 @@ while True:
             MAX_RANGE_F = temp_max_range_f
             MIN_RANGE_C = convert_temp(f=MIN_RANGE_F)  # update range temp in Celsius
             MAX_RANGE_C = convert_temp(f=MAX_RANGE_F)  # update range temp in Celsius
-            status_label.color = WHITE
-            status_label.text  = "ORIG"
-            time.sleep(0.2)
-            status_label.color = BLACK
-            time.sleep(0.2)
+            flash_status("ORIG", 0.2)
         else:
             display_focus = True  # set range values to image min/max
             temp_min_range_f = MIN_RANGE_F
@@ -379,11 +377,7 @@ while True:
             MAX_RANGE_F = convert_temp(c=v_max)
             MIN_RANGE_C = v_min  # update range temp in Celsius
             MAX_RANGE_C = v_max  # update range temp in Celsius
-            status_label.color = WHITE
-            status_label.text  = "FOCUS"
-            time.sleep(0.2)
-            status_label.color = BLACK
-            time.sleep(0.2)
+            flash_status("FOCUS", 0.2)
         while panel.button.select:  pass  # wait for button release
 
     if panel.button.start:  # activate setup mode (setup mode = start button)
