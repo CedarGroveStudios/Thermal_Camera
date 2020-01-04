@@ -204,11 +204,11 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
     return int(alarm_value.text), int(max_value.text),int(min_value.text)
 
 def move_buttons(joystick=False):  # Read position buttons and joystick
+    move_r = move_l = False
+    move_u = move_d = False
     if joystick:  # For PyGamer: interpret joystick as buttons
-        move_r = move_l = False
         if   panel.joystick[0] > 44000: move_r = True
         elif panel.joystick[0] < 20000: move_l = True
-        move_u = move_d = False
         if   panel.joystick[1] < 20000: move_u = True
         elif panel.joystick[1] > 44000: move_d = True
     else:  # For PyBadge
@@ -387,4 +387,3 @@ while True:
         ALARM_C = convert_temp(f=ALARM_F)  # update alarm threshold temp in Celsius
         MIN_RANGE_C = convert_temp(f=MIN_RANGE_F)  # update range temp in Celsius
         MAX_RANGE_C = convert_temp(f=MAX_RANGE_F)  # update range temp in Celsius
-        
