@@ -45,6 +45,7 @@ Required:
 
 Optional:
 1) Graphical temperature display that includes a reprentative image, histogram, and trends.
+2) Image view: 45 to 60-degree field of view over 5-meter minimum imaging range.
 2) Hold measurements for analysis.
 3) Interactive minimum and maximum display range settings.
 4) Record and retain monitoring history for up to two hours. Display historical data or create file for external analysis.
