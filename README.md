@@ -16,7 +16,7 @@ This implementation uses the Adafruit AMG8833 Thermal Camera FeatherWing. The br
 
 A section of duct for the clothes dryer in our late 1940s-era home seemed to be prone to developing obstructions. It's scheduled to be replaced in a couple of months, but until it is, we'll keep a pretty close eye on it and clean it often. If only there was a way to monitor airflow and temperature along that 2 meter section.
 
-The first duct monitor designs used thermistors and eventually thermocouples connected to an Adafruit Feather M4 Express. Code was to be be written in CircuitPython. Some graphic visualization would be nice as would a wireless IoT approach, but monitoring with a local audible alarm were more important.
+The first duct monitor designs used thermistors and eventually thermocouples connected to an Adafruit Feather M4 Express. Code was to be be written in CircuitPython. Some graphic visualization would be nice as would a wireless IoT approach, but monitoring with a local audible alarm was more important.
 
 
 ## Primary Project Objectives
