@@ -37,7 +37,7 @@ Note: Although the author is experienced with Arduino coding, the choice to use 
 ## Primary Project Objectives
 Required:
 1) Continuously monitor and detect abnormal temperatures along a two-meter section of clothes dryer duct with a minimum sampling rate of one series of measurements per ten seconds.
-2) Monitor and detect a minimum of three data points (duct entry, middle, and end sections). The minimum temperature monitoring range is from typical room temperature to ten degrees Celsius above the maximum safe operating temperature. The alarm threshold is set by a default start-up configuration file and manually through the device user interface.
+2) Monitor and detect a minimum of three data points (duct entry, middle, and end sections). The minimum temperature monitoring range is from typical room temperature to ten degrees Celsius above the maximum safe operating temperature. Typical accuracy of +/-2.5 degrees C is sufficient. The alarm threshold is set by a default start-up configuration file and manually through the device user interface.
 3) An alarm condition activates a locally-placed and distintive audible alarm signal that continuously sounds until the high temperature drops to a safe level.
 4) The duct temperature measurements will be displayed in easy to read numerals, defaulting to degrees Fahrenheit.
 5) The device is powered by a wall-mounted USB power supply that provides primary operating power and charging of the device's internal backup battery. Battery backup duration is one-hour minimum.
