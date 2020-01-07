@@ -26,8 +26,13 @@ The design evolved from the inital prototype tests to a final version that met t
 
 Test video: https://youtu.be/IyMZOlKJu3Q
 
-Note: Although the author is experienced with Arduino coding, the choice to use CircuitPython for the software implementation was driven by the desire to continue to learn more about Python coding and particularly the CircuitPython graphical library, DisplayIO.
+The Thermal Camera utilizes four PyGamer/PyBadge-stored files to operate:
+*  Thermal_Cam_2020-01-03_v21.py (renamed to code.py), the primary code module, version 2.1, stored in the root directory
+*  Thermal_Cam_config.py, a Python-formatted list of default operating parameters in text file format, stored in the root directory
+*  Thermal_Cam_splash.bmp, a bitmapped graphics file used for the opening splash screen, stored in the root directory
+*  OpenSans-9.bdf, a sans serif font file, stored in a fonts folder
 
+Note: Although the author is experienced with Arduino coding, the choice to use CircuitPython for the software implementation was driven by the desire to continue to learn more about Python coding and particularly the CircuitPython graphical library, DisplayIO.
 
 ## Primary Project Objectives
 Required:
@@ -58,6 +63,7 @@ Optional:
 ![Image of Module](https://github.com/CedarGroveStudios/Thermal_Camera/blob/master/photos%20and%20graphics/screen_cam_matrix/Slide4.PNG)
 
 ## Next Steps
+
 
 
 ![Image of Module](https://github.com/CedarGroveStudios/Thermal_Camera/blob/master/photos%20and%20graphics/DSC05942a_wide.jpg)
