@@ -14,11 +14,11 @@ This implementation uses the Adafruit AMG8833 Thermal Camera FeatherWing (https:
 
 ## Project Description
 
-A section of duct for the clothes dryer in our late 1940s-era home seemed to be prone to developing obstructions. It's scheduled to be replaced in a couple of months, but until it is, we'll keep a pretty close eye on it and clean it often. This project evolved from the need to watch for abnormal temperature build-up along the problemmatic two-meter section of exhaust duct.
+A section of exhaust duct for the clothes dryer in our late 1940s-era home seemed to be prone to developing obstructions. It's scheduled to be replaced in a couple of months, but until it is, we'll keep a pretty close eye on it and clean it often. This project evolved from the need to watch for abnormal temperature build-up along the problemmatic two-meter section of exhaust duct.
 
-The first duct monitor designs used thermistors (eventually thermocouples) connected to an Adafruit Feather M4 Express for data collection and analysis. Code was to be be written in CircuitPython. Some graphic visualization would be nice as would a wireless IoT approach, but monitoring with a local audible alarm was more important.
+The first exhaust duct monitor designs used thermistors (eventually thermocouples) connected to an Adafruit Feather M4 Express for data collection and analysis. Code was to be be written in CircuitPython. Some graphic visualization would be nice as would a wireless IoT approach, but monitoring with a local audible alarm was more important.
 
-As the project design developed, the AMG8833 8x8 thermopile array sensor and its imaging capability became more desireable. Not only did the sensor match the needed temperature range, it provided the capability to measure many points along the duct rather than only three. Also, the sensor could be mounted in a convienient location a distance away from the duct and still perform the needed measurements. There was also no need to string wires and physicallyl mount thermocouples to the ductwork.
+As the project design developed, the AMG8833 8x8 thermopile array sensor and its imaging capability became more desireable. Not only did the sensor match the needed temperature range, it provided the capability to measure many points along the duct rather than only three. Also, the sensor could be mounted in a convienient location a distance away from the duct and still perform the needed measurements. There was also no need to string wires and physically mount thermocouples to the ductwork.
 
 It first appeared that CircuitPython may not be fast enough to process the AMG8833 matrix data for real-time graphical imaging, but would only be responsive when conducting simple numerical calculations (like alarm threshold detection) on the matrix data. Since a ten-second measurement interval was fast enough for this project, evolving the design to include a graphical image display was seen as a possibility in spite of those perceived limitations. After some initial prototype tests, it was found that CircuitPython and the DisplayIO library were indeed fast enough and could provide a measurement interval of less than one second per frame of 64 measurements.
 
@@ -36,10 +36,10 @@ Note: Although the author is experienced with Arduino coding, the choice to use 
 
 ## Primary Project Objectives
 Required:
-1) Continuously monitor and detect abnormal temperatures along a two-meter section of clothes dryer duct with a minimum sampling rate of one series of measurements per ten seconds.
+1) Continuously monitor and detect abnormal temperatures along a two-meter section of clothes dryer exhaust duct with a minimum sampling rate of one series of measurements per ten seconds.
 2) Monitor and detect a minimum of three data points (duct entry, middle, and end sections). The minimum temperature monitoring range is from typical room temperature to ten degrees Celsius above the maximum safe operating temperature. Typical accuracy of +/-2.5 degrees C is sufficient. The alarm threshold is set by a default start-up configuration file and manually through the device user interface.
 3) An alarm condition activates a locally-placed and distintive audible alarm signal that continuously sounds until the high temperature drops to a safe level.
-4) The duct temperature measurements will be displayed in easy to read numerals, defaulting to degrees Fahrenheit.
+4) The exhaust duct temperature measurements will be displayed in easy to read numerals, defaulting to degrees Fahrenheit.
 5) The device is powered by a wall-mounted USB power supply that provides primary operating power and charging of the device's internal backup battery. Battery backup duration is one-hour minimum.
 6) Utilize CircuitPython for the software implementation.
 
