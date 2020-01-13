@@ -36,7 +36,7 @@ with open("/thermal_cam_splash.bmp", "rb") as bitmap_file:
     splash.append(displayio.TileGrid(bitmap,
                   pixel_shader=displayio.ColorConverter()))
     board.DISPLAY.show(splash)
-    time.sleep(0.1)  # allow the splash to display
+    time.sleep(0.1)  # Allow the splash to display
 
 panel.play_tone(440, 0.1)  # A4
 panel.play_tone(880, 0.1)  # A5
@@ -44,8 +44,7 @@ panel.play_tone(880, 0.1)  # A5
 Coords = namedtuple("Point", "x y")
 
 ### Settings ###
-
-# Load F default alarm and min/max range values
+# Load default alarm and min/max range values list from config file
 from Thermal_Cam_config import *
 
 WIDTH  = board.DISPLAY.width
@@ -70,9 +69,11 @@ element_color = [GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, VIOLET, WHITE]
 param_list = [("ALARM", WHITE), ("RANGE", RED), ("RANGE", CYAN)]
 
 ### Converters and Helpers ###
-def convert_temp(f=None, c=None):  # convert F to C and C to F
-    if f != None and c == None: return round((f - 32) * (5 / 9))  # F to C
-    if f == None and c != None: return round(((9 / 5) * c) + 32)  # C to F
+def convert_temp(f=None, c=None):  # convert F to C or C to F
+    if f != None and c == None:
+        return round((f - 32) * (5 / 9))  # F to C
+    if f == None and c != None:
+        return round(((9 / 5) * c) + 32)  # C to F
     return None
 
 def element_grid(col, row):  # Determine display coordinates for column, row
@@ -99,7 +100,8 @@ def update_image_frame():  # Get camera data and display
     for row in range(0, 8):  # Parse camera data list and update display
         for col in range(0, 8):
             value = map_range(image[7 - row][7 - col],
-                            MIN_SENSOR_C, MAX_SENSOR_C, MIN_SENSOR_C, MAX_SENSOR_C)
+                              MIN_SENSOR_C, MAX_SENSOR_C,
+                              MIN_SENSOR_C, MAX_SENSOR_C)
             color_index = int(map_range(value, MIN_RANGE_C, MAX_RANGE_C, 0, 7))
             image_group[((row * 8) + col) + 1].fill = element_color[color_index]
             sum_bucket = sum_bucket + value  # Calculate sum for average
@@ -118,10 +120,11 @@ def update_histo_frame():
     sum_bucket = 0  # Clear bucket for building average value
 
     histo_bucket = [0, 0, 0, 0, 0, 0, 0, 0]  # Clear histogram bucket
-    for row in range(7, -1, -1):  # Collect camera data list and calculate spectrum
+    for row in range(7, -1, -1):  # Collect camera data and calculate spectrum
         for col in range(0, 8):
             value = map_range(image[col][row],
-                              MIN_SENSOR_C, MAX_SENSOR_C, MIN_SENSOR_C, MAX_SENSOR_C)
+                              MIN_SENSOR_C, MAX_SENSOR_C,
+                              MIN_SENSOR_C, MAX_SENSOR_C)
             histo_index = int(map_range(value, MIN_RANGE_C, MAX_RANGE_C, 0, 7))
             histo_bucket[histo_index] = histo_bucket[histo_index] + 1
             sum_bucket = sum_bucket + value  # Calculate sum for average
@@ -156,10 +159,14 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
     while not panel.button.start:
         while (not panel.button.a) and (not panel.button.start):
             left, right, up, down = move_buttons(joystick=panel.has_joystick)
-            if up  : param_index = param_index - 1
-            if down: param_index = param_index + 1
-            if param_index > 2: param_index = 2
-            if param_index < 0: param_index = 0
+            if up:
+                param_index = param_index - 1
+            if down:
+                param_index = param_index + 1
+            if param_index > 2:
+                param_index = 2
+            if param_index < 0:
+                param_index = 0
             status_label.text = param_list[param_index][0]
             image_group[param_index + 66].color = BLACK
             status_label.color = BLACK
@@ -168,17 +175,23 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
             status_label.color = WHITE
             time.sleep(0.2)
 
-        if panel.button.a:  panel.play_tone(1319, 0.030)  # E6
-        while panel.button.a:  pass  # wait for button release
+        if panel.button.a:  # Button A pressed
+            panel.play_tone(1319, 0.030)  # E6
+        while panel.button.a:  # wait for button release
+            pass
 
         # Adjust parameter value
         param_value = int(image_group[param_index + 70].text)
         while (not panel.button.a) and (not panel.button.start):
             left, right, up, down = move_buttons(joystick=panel.has_joystick)
-            if up  :  param_value = param_value + 1
-            if down:  param_value = param_value - 1
-            if param_value > convert_temp(c=MAX_SENSOR_C):  param_value = convert_temp(c=MAX_SENSOR_C)
-            if param_value < convert_temp(c=MIN_SENSOR_C):  param_value = convert_temp(c=MIN_SENSOR_C)
+            if up:
+                param_value = param_value + 1
+            if down:
+                param_value = param_value - 1
+            if param_value > convert_temp(c=MAX_SENSOR_C):
+                param_value = convert_temp(c=MAX_SENSOR_C)
+            if param_value < convert_temp(c=MIN_SENSOR_C):
+                param_value = convert_temp(c=MIN_SENSOR_C)
             image_group[param_index + 70].text = str(param_value)
             image_group[param_index + 70].color = BLACK
             status_label.color = BLACK
@@ -187,12 +200,16 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
             status_label.color = WHITE
             time.sleep(0.2)
 
-        if panel.button.a:  panel.play_tone(1319, 0.030)  # E6
-        while panel.button.a:  pass  # wait for button release
+        if panel.button.a:  # Button A pressed
+            panel.play_tone(1319, 0.030)  # E6
+        while panel.button.a:  # wait for button release
+            pass
 
     # Exit setup process
-    if panel.button.start: panel.play_tone(784, 0.030)  # G5
-    while panel.button.start:  pass  # wait for button release
+    if panel.button.start:  # Start button pressed
+        panel.play_tone(784, 0.030)  # G5
+    while panel.button.start:  # wait for button release
+        pass
 
     status_label.text = "RESUME"
     time.sleep(0.5)
@@ -201,21 +218,29 @@ def setup_mode():  # Set alarm threshold and minimum/maximum range values
     # Display average label and value
     ave_label.color = YELLOW
     ave_value.color = YELLOW
-    return int(alarm_value.text), int(max_value.text),int(min_value.text)
+    return int(alarm_value.text), int(max_value.text), int(min_value.text)
 
 def move_buttons(joystick=False):  # Read position buttons and joystick
     move_r = move_l = False
     move_u = move_d = False
     if joystick:  # For PyGamer: interpret joystick as buttons
-        if   panel.joystick[0] > 44000: move_r = True
-        elif panel.joystick[0] < 20000: move_l = True
-        if   panel.joystick[1] < 20000: move_u = True
-        elif panel.joystick[1] > 44000: move_d = True
+        if   panel.joystick[0] > 44000:
+            move_r = True
+        elif panel.joystick[0] < 20000:
+            move_l = True
+        if   panel.joystick[1] < 20000:
+            move_u = True
+        elif panel.joystick[1] > 44000:
+            move_d = True
     else:  # For PyBadge
-        if panel.button.right: move_r = True
-        if panel.button.left : move_l = True
-        if panel.button.up   : move_u = True
-        if panel.button.down : move_d = True
+        if panel.button.right:
+            move_r = True
+        if panel.button.left:
+            move_l = True
+        if panel.button.up:
+            move_u = True
+        if panel.button.down:
+            move_d = True
     return move_r, move_l, move_u, move_d
 
 # Set C default alarm and min/max range values
@@ -344,21 +369,28 @@ while True:
     ave_value.text   = str(convert_temp(c=v_sum // 64))
 
     # play alarm note if maximum value reaches alarm threshold
-    if v_max >= ALARM_C:  panel.play_tone(880, 0.015)  # A5
-    if v_max >= ALARM_C:  panel.play_tone(880 + (10 * (v_max - ALARM_C)), 0.015)  # A5
+    if v_max >= ALARM_C:
+        panel.play_tone(880, 0.015)  # A5
+    if v_max >= ALARM_C:
+        panel.play_tone(880 + (10 * (v_max - ALARM_C)), 0.015)  # A5
 
     # See if a panel button is pressed
     if panel.button.a:  # toggle display hold (shutter = button A)
         panel.play_tone(1319, 0.030)  # E6
-        while panel.button.a:  pass   # wait for button release
-        if display_hold == False:  display_hold = True
-        else:  display_hold = False
+        while panel.button.a:
+            pass   # wait for button release
+        if display_hold == False:
+            display_hold = True
+        else:
+            display_hold = False
 
     if panel.button.b:  # toggle image/histogram mode (display mode = button B)
         panel.play_tone(659, 0.030)  # E5
         while panel.button.b:  pass  # wait for button release
-        if display_image:  display_image = False
-        else: display_image = True
+        if display_image:
+            display_image = False
+        else:
+            display_image = True
 
     if panel.button.select:  # toggle focus mode (focus = select button)
         panel.play_tone(698, 0.030)  # F5
@@ -378,11 +410,13 @@ while True:
             MIN_RANGE_C = v_min  # update range temp in Celsius
             MAX_RANGE_C = v_max  # update range temp in Celsius
             flash_status("FOCUS", 0.2)
-        while panel.button.select:  pass  # wait for button release
+        while panel.button.select:
+            pass  # wait for button release
 
     if panel.button.start:  # activate setup mode (setup mode = start button)
         panel.play_tone(784, 0.030)  # G5
-        while panel.button.start:  pass  # wait for button release
+        while panel.button.start:
+            pass  # wait for button release
         ALARM_F, MAX_RANGE_F, MIN_RANGE_F = setup_mode()  # get alarm and range values
         ALARM_C = convert_temp(f=ALARM_F)  # update alarm threshold temp in Celsius
         MIN_RANGE_C = convert_temp(f=MIN_RANGE_F)  # update range temp in Celsius
