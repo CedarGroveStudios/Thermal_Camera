@@ -70,15 +70,9 @@ param_list = [("ALARM", WHITE), ("RANGE", RED), ("RANGE", CYAN)]
 
 ### Converters and Helpers ###
 def celsius_to_fahrenheit(temperature=None):  # convert C to F
-    if temperature == None:
-        raise RuntimeError("Invalid value")
-        return None
     return round(((9 / 5) * temperature) + 32)  # C to F
 
 def fahrenheit_to_celsius(temperature=None):  # convert F to C
-    if temperature == None:
-        raise RuntimeError("Invalid value")
-        return None
     return round((temperature - 32) * (5 / 9))  # F to C
 
 def element_grid(col, row):  # Determine display coordinates for column, row
