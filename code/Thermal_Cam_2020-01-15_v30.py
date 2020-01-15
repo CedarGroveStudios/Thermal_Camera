@@ -16,9 +16,10 @@ from adafruit_pybadger import PyBadger
 from thermal_cam_converters import celsius_to_fahrenheit, fahrenheit_to_celsius
 
 # Establish panel instance and check for joystick
-panel = PyBadger(pixels_brightness=0.1)  # Set NeoPixel brightness
+panel = PyBadger(pixels_brightness=0.05)  # Set NeoPixel brightness
+panel.pixels.fill(0)                      # Clear all NeoPixels
 if hasattr(board, "JOYSTICK_X"):
-    panel.has_joystick = True     # PyBadge
+    panel.has_joystick = True     # PyGamer
 else: panel.has_joystick = False  # Must be PyBadge
 
 # Establish I2C interface for the AMG8833 Thermal Camera
@@ -56,8 +57,8 @@ MIN_RANGE_C = fahrenheit_to_celsius(MIN_RANGE_F)
 MAX_RANGE_C = fahrenheit_to_celsius(MAX_RANGE_F)
 
 # The board's integral display size
-WIDTH  = board.DISPLAY.width
-HEIGHT = board.DISPLAY.height
+WIDTH  = board.DISPLAY.width   # 160 for PyGamer and PyBadge
+HEIGHT = board.DISPLAY.height  # 128 for PyGamer and PyBadge
 
 ELEMENT_SIZE = 16  # Size of element_grid blocks in pixels
 
@@ -78,11 +79,11 @@ element_color = [GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, VIOLET, WHITE]
 # Text colors for on-screen parameters
 param_list = [("ALARM", WHITE), ("RANGE", RED), ("RANGE", CYAN)]
 
-### Converters and Helpers ###
+### Helpers ###
 def element_grid(col, row):  # Determine display coordinates for column, row
     return Coords(int(ELEMENT_SIZE * col + 30), int(ELEMENT_SIZE * row + 1))
 
-def flash_status(text="", duration=0.1):  # Flash status message once
+def flash_status(text="", duration=0.05):  # Flash status message once
     status_label.color = WHITE
     status_label.text  = text
     time.sleep(duration)
@@ -256,7 +257,7 @@ background = displayio.TileGrid(color_bitmap, pixel_shader=color_palette,
                                 x=0, y=0)
 image_group.append(background)
 
-# define the foundational thermal image element layers; image_group[1:64]
+# Define the foundational thermal image element layers; image_group[1:64]
 #   image_group[#]=(row * 8) + column
 for row in range(0, 8):
     for col in range(0, 8):
@@ -271,73 +272,73 @@ status_label = Label(font, text="", color=BLACK, max_glyphs=6)
 pos = element_grid(2.5, 4)
 status_label.x = pos.x
 status_label.y = pos.y
-image_group.append(status_label)
+image_group.append(status_label)  # image_group[65]
 
 alarm_label = Label(font, text="alm", color=WHITE, max_glyphs=3)
 pos = element_grid(-1.8, 1.5)
 alarm_label.x = pos.x
 alarm_label.y = pos.y
-image_group.append(alarm_label)
+image_group.append(alarm_label)  # image_group[66]
 
 max_label = Label(font, text="max", color=RED, max_glyphs=3)
 pos = element_grid(-1.8, 3.5)
 max_label.x = pos.x
 max_label.y = pos.y
-image_group.append(max_label)
+image_group.append(max_label)  # image_group[67]
 
 min_label = Label(font, text="min", color=CYAN, max_glyphs=3)
 pos = element_grid(-1.8, 7.5)
 min_label.x = pos.x
 min_label.y = pos.y
-image_group.append(min_label)
+image_group.append(min_label)  # image_group[68]
 
 ave_label = Label(font, text="ave", color=YELLOW, max_glyphs=3)
 pos = element_grid(-1.8, 5.5)
 ave_label.x = pos.x
 ave_label.y = pos.y
-image_group.append(ave_label)
+image_group.append(ave_label)  # image_group[69]
 
 alarm_value = Label(font, text=str(ALARM_F), color=WHITE, max_glyphs=5)
 pos = element_grid(-1.8, 0.5)
 alarm_value.x = pos.x
 alarm_value.y = pos.y
-image_group.append(alarm_value)
+image_group.append(alarm_value)  # image_group[70]
 
 max_value = Label(font, text=str(MAX_RANGE_F), color=RED, max_glyphs=5)
 pos = element_grid(-1.8, 2.5)
 max_value.x = pos.x
 max_value.y = pos.y
-image_group.append(max_value)
+image_group.append(max_value)  # image_group[71]
 
 min_value = Label(font, text=str(MIN_RANGE_F), color=CYAN, max_glyphs=5)
 pos = element_grid(-1.8, 6.5)
 min_value.x = pos.x
 min_value.y = pos.y
-image_group.append(min_value)
+image_group.append(min_value)  # image_group[72]
 
 ave_value = Label(font, text="---", color=YELLOW, max_glyphs=5)
 pos = element_grid(-1.8, 4.5)
 ave_value.x = pos.x
 ave_value.y = pos.y
-image_group.append(ave_value)
+image_group.append(ave_value)  # image_group[73]
 
 min_histo = Label(font, text="", color=CYAN, max_glyphs=3)
 pos = element_grid(0.5, 7.5)
 min_histo.x = pos.x
 min_histo.y = pos.y
-image_group.append(min_histo)
+image_group.append(min_histo)  # image_group[74]
 
 max_histo = Label(font, text="", color=RED, max_glyphs=3)
 pos = element_grid(6.5, 7.5)
 max_histo.x = pos.x
 max_histo.y = pos.y
-image_group.append(max_histo)
+image_group.append(max_histo)  # image_group[75]
 
 range_histo = Label(font, text="", color=BLUE, max_glyphs=7)
 pos = element_grid(2.5, 7.5)
 range_histo.x = pos.x
 range_histo.y = pos.y
-image_group.append(range_histo)
+image_group.append(range_histo)  # image_group[76]
 
 ###--- PRIMARY PROCESS SETUP ---###
 display_image = True   # Image display mode; False for histogram
@@ -370,10 +371,10 @@ while True:
     # Flash first NeoPixel and play alarm notes if alarm threshold is exceeded
     # Second alarm note frequency is proportional to value above threshold
     if v_max >= ALARM_C:
-        panel.pixels[0] = RED
+        panel.pixels.fill(RED)
         panel.play_tone(880, 0.015)  # A5
         panel.play_tone(880 + (10 * (v_max - ALARM_C)), 0.015)  # A5
-        panel.pixels[0] = BLACK
+        panel.pixels.fill(BLACK)
 
     # See if a panel button is pressed
     if panel.button.a:  # Toggle display hold (shutter = button A)
